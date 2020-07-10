@@ -11,12 +11,17 @@
 #include "sapi.h"
 
 typedef enum {
+		APAGADO,
 		VERDE = LED3,
 		AMARILLO = LED1,
 		ROJO = LED2
 }LED_t;
 
 void encender(LED_t led);
+
+void apagarTodo();
+
+LED_t statusLed();
 
 
 

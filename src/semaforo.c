@@ -7,12 +7,11 @@
 
 #include "semaforo.h"
 
-LED_t ledEnc = VERDE;
 delay_t tiempo;
 
 void establecerInicio() {
 	estado_semaforo = ROJO_STATE;
-	gpioWrite((LED_t) ROJO, ON);
+	encender((LED_t) ROJO);
 	return;
 }
 
@@ -23,38 +22,34 @@ void establecerEstado(estado_t nuevo_estado) {
 
 void actualizarSemaforo() {
 	if (estado_semaforo == VERDE_STATE) {
-		if (gpioRead((LED_t) ROJO)) {
-			gpioWrite((LED_t) ROJO, OFF);
-			gpioWrite((LED_t) AMARILLO, ON);
+		if (statusLed() == (LED_t) ROJO) {
+			encender((LED_t) AMARILLO);
 			delayInit(&tiempo, 1000);
-		} else if (gpioRead((LED_t) AMARILLO)) {
-			if (delayRead(&tiempo)) {
-				gpioWrite((LED_t) AMARILLO, OFF);
-				gpioWrite((LED_t) VERDE, ON);
-			}
+		} else if (statusLed() == (LED_t) AMARILLO) {
+			if (delayRead(&tiempo))
+				encender((LED_t) VERDE);
 		} else
-			gpioWrite((LED_t) VERDE, ON);
+			encender((LED_t) VERDE);
 	}
 	if (estado_semaforo == AMARILLO_STATE) {
-		gpioWrite((LED_t) VERDE, OFF);
-		gpioWrite((LED_t) ROJO, OFF);
 		if (delayRead(&tiempo)) {
+			if (statusLed() == (LED_t) APAGADO)
+				encender((LED_t) AMARILLO);
+			else
+				apagarTodo();
 			delayInit(&tiempo, 1000);
-			gpioToggle((LED_t) AMARILLO);
 		}
 	}
 	if (estado_semaforo == ROJO_STATE) {
-		if (gpioRead((LED_t) VERDE)) {
-			gpioWrite((LED_t) VERDE, OFF);
-			gpioWrite((LED_t) AMARILLO, ON);
+		if (statusLed() == (LED_t) VERDE) {
+			encender((LED_t) AMARILLO);
 			delayInit(&tiempo, 1000);
-		} else if (gpioRead((LED_t) AMARILLO)) {
+		} else if (statusLed() == (LED_t) AMARILLO) {
 			if (delayRead(&tiempo)) {
-				gpioWrite((LED_t) AMARILLO, OFF);
-				gpioWrite((LED_t) ROJO, ON);
+				encender((LED_t) ROJO);
 			}
 		} else
-			gpioWrite((LED_t) ROJO, ON);
+			encender((LED_t) ROJO);
 	}
 	return;
 }
